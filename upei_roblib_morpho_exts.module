@@ -5,14 +5,15 @@
  * Implementation of robertson library morphospace customizations.
  */
 
-
 /**
- * Implements hook_islandora_datastream_alter
+ * Implements hook_islandora_object_ingested
  */
-function upei_roblib_morpho_exts_islandora_datastream_alter(AbstractObject $object, AbstractDatastream $datastream, array &$context) {
-  if ($datastream->id != 'MODS') {
+function upei_roblib_morpho_exts_islandora_object_ingested($object) {
+  if (empty($object['MODS'])) {
     return;
   }
+  $datastream = $object['MODS'];
+  // content models we are interested in customizing
   $cmodels = array(
     'islandora:sp_basic_image',
     'islandora:sp_large_image_cmodel',
@@ -59,7 +60,7 @@ function upei_roblib_morpho_exts_add_parentinfo_to_mods($object, $datastream) {
   }
   if (empty($species)) {
     $mods_element = $mods_doc->getElementsByTagName('mods');
-    $species_note = $mods_doc->createElement("mods:note", $label);
+    $species_note = $mods_doc->createElement("note", $label);
     $species_note->setAttribute('type', 'species');
     $mods_element->item(0)->appendChild($species_note);
   }
@@ -67,6 +68,6 @@ function upei_roblib_morpho_exts_add_parentinfo_to_mods($object, $datastream) {
     $species->nodeValue = $label;
   }
   $mods_xml = $mods_doc->saveXML();
-  $datastream->content = $mods_doc->saveXML();
+  $datastream->content = $mods_xml;
 }
 
